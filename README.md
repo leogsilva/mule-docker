@@ -6,7 +6,7 @@ In addition you may want to add the SYS_NICE capability, in order for ntpd to be
 
 Example:
 ```
-docker run --cap-add=SYS_TIME --cap-add=SYS_NICE ivankrizsan/mule-docker:latest
+docker run --cap-add=SYS_TIME --cap-add=SYS_NICE leogsilva/mule-docker:latest
 ```
 
 ## Volumes
@@ -23,7 +23,7 @@ This IP address is used to expose JMX of the Mule ESB instance running in the Do
 
 Example:
 ```
-docker run -e "SET_CONTAINER_TIMEZONE=true" -e "CONTAINER_TIMEZONE=Europe/Stockholm" -e "CONTAINER_EXTERNAL_IP=192.168.99.100" ivankrizsan/mule-docker:latest
+docker run -e "SET_CONTAINER_TIMEZONE=true" -e "CONTAINER_TIMEZONE=Europe/Stockholm" -e "CONTAINER_EXTERNAL_IP=192.168.99.100" leogsilva/mule-docker:latest
 ```
 
 ## Exposed ports
@@ -37,5 +37,29 @@ service:jmx:rmi:///jndi/rmi://192.168.99.100:1099/jmxrmi
 ```
 <br/>Note that the IP address may need to be updated and the port number depends on the port mapping configuration when the container was launched.<br/>
 
+## Pre-configured example app
+This container also contains a pre-compiled application that exposes an API endpoint like 
+```
+http://<host ip>:8081/world?language=English
+```
+
+## Running with Jolokia 
+Only exposing logs dir and with Jolokia port exposed
+```
+sudo docker run -d --cap-add=SYS_TIME --cap-add=SYS_NICE -p 8080:8899 -p 1099:1099 -p 8081:8081 -v $HOME/mule-docker/mule-standalone/logs:/opt/mule-standalone/logs mule
+```
+
+To validate jolokia, invoke the following endpoint using any web browser:
+```
+http://34.205.250.219:8080/jolokia/read/Mule.basic_tutorial-1.0.0-SNAPSHOT:Application=!%22application%20totals!%22,type=org.mule.Statistics
+```
+
+## Calling jolokia to validate installation
+
+
 ## Note!
-Mule ESB on Alpine Linux has not, to my knowledge, received extensive testing.
+* The best use of docker with mule is creating a container with application pre-deployed and not exposing apps dir on host. In my tests, exposing app 
+directory on host causes application to being redeployed multiple times
+* Mule ESB on Alpine Linux has not, to my knowledge, received extensive testing.
+
+
